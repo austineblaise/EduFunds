@@ -114,11 +114,11 @@ export default function StudentDashboard() {
         </div>
 
         <div className="bg-white shadow rounded-lg p-6 overflow-auto">
-          <h3 className="text-lg font-semibold mb-4 text-black">Your Stipends</h3>
+          <h3 className="text-lg font-semibold mb-4">Your Stipends</h3>
           {stipends.length === 0 ? (
             <p className="text-gray-500">No stipends assigned yet.</p>
           ) : (
-            <table className="min-w-full text-sm text-black">
+            <table className="min-w-full text-sm">
               <thead>
                 <tr className="text-left border-b">
                   <th className="py-2 px-4">#</th>
