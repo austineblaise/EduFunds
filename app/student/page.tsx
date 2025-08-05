@@ -22,6 +22,9 @@ export default function StudentDashboard() {
   const { address, isConnected } = useAccount();
   const { connect, status } = useConnect();
   const { disconnect } = useDisconnect();
+  const [currentTime, setCurrentTime] = useState(Date.now());
+
+
 
   const [stipends, setStipends] = useState<Stipend[]>([]);
   const [loading, setLoading] = useState(false);
@@ -31,26 +34,65 @@ export default function StudentDashboard() {
     return await provider.getSigner();
   };
 
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentTime(Date.now());
+    }, 30000); // 30000ms = 30 seconds
+  
+    return () => clearInterval(interval);
+  }, []);
+  
+
+
   const loadStipends = async () => {
     if (!address) return;
-    const signer = await getSigner();
-    const stipend = new ethers.Contract(
-      STIPEND_MANAGER_ADDRESS,
-      StipendManagerAbi.abi,
-      signer
-    );
-
-    const data = await stipend.getMyStipends();
-
-    setStipends(
-      data.map((s: any) => ({
-        amount: Number(ethers.formatEther(s.amount)),
-        unlockDate: Number(s.unlockDate),
-        withdrawn: s.withdrawn,
-        category: s.category ?? "Unspecified",
-      }))
-    );
+    try {
+      setLoading(true);
+      const signer = await getSigner();
+      const stipend = new ethers.Contract(
+        STIPEND_MANAGER_ADDRESS,
+        StipendManagerAbi.abi,
+        signer
+      );
+      const data = await stipend.getMyStipends();
+      setStipends(
+        data.map((s: any) => ({
+          amount: Number(ethers.formatEther(s.amount)),
+          unlockDate: Number(s.unlockDate),
+          withdrawn: s.withdrawn,
+          category: s.category ?? "Unspecified",
+        }))
+      );
+    } catch (e) {
+      console.error("Failed to load stipends:", e);
+      toast.error("Failed to load stipends.");
+    } finally {
+      setLoading(false);
+    }
   };
+  
+
+  // const loadStipends = async () => {
+  //   if (!address) return;
+  //   const signer = await getSigner();
+  //   const stipend = new ethers.Contract(
+  //     STIPEND_MANAGER_ADDRESS,
+  //     StipendManagerAbi.abi,
+  //     signer
+  //   );
+
+  //   const data = await stipend.getMyStipends();
+
+  //   setStipends(
+  //     data.map((s: any) => ({
+  //       amount: Number(ethers.formatEther(s.amount)),
+  //       unlockDate: Number(s.unlockDate),
+  //       withdrawn: s.withdrawn,
+  //       category: s.category ?? "Unspecified",
+  //     }))
+  //   );
+  // };
 
   useEffect(() => {
     if (isConnected) loadStipends();
@@ -114,7 +156,91 @@ export default function StudentDashboard() {
           )}
         </div>
 
-        <div className="bg-white shadow rounded-lg p-6 overflow-auto">
+
+        <div className="bg-white shadow rounded-lg p-6 overflow-x-auto text-black">
+  <h3 className="text-lg font-semibold mb-4 text-black">Your Stipends</h3>
+
+  {loading ? (
+    <div className="text-center py-6 text-gray-500">Loading stipends...</div>
+  ) : stipends.length === 0 ? (
+    <p className="text-gray-500">No stipends assigned yet.</p>
+  ) : (
+    <table className="min-w-full text-sm text-left border border-gray-200 rounded-md overflow-hidden">
+      <thead className="bg-gray-100 text-gray-700 font-medium">
+        <tr>
+          <th className="py-3 px-4">#</th>
+          <th className="py-3 px-4">Amount (EDU)</th>
+          <th className="py-3 px-4">Category</th>
+          <th className="py-3 px-4">Unlocks</th>
+          <th className="py-3 px-4">Status</th>
+          <th className="py-3 px-4">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {stipends.map((stipend, index) => {
+          const unlocked = stipend.unlockDate <= now && !stipend.withdrawn;
+          // const unlockDateFormatted = formatDistanceToNow(
+          //   new Date(stipend.unlockDate * 1000),
+          //   { addSuffix: true }
+          // );
+
+          const unlockDateFormatted = formatDistanceToNow(
+            new Date(stipend.unlockDate * 1000),
+            { addSuffix: true, includeSeconds: false }
+          );
+          
+
+          return (
+            <tr
+              key={index}
+              className={`border-t hover:bg-gray-50 ${
+                index % 2 === 0 ? "bg-white" : "bg-gray-50"
+              }`}
+            >
+              <td className="py-2 px-4 font-semibold">{index + 1}</td>
+              <td className="py-2 px-4">{stipend.amount}</td>
+              <td className="py-2 px-4 capitalize">{stipend.category}</td>
+              <td className="py-2 px-4">{unlockDateFormatted}</td>
+              <td className="py-2 px-4">
+                <span
+                  className={`inline-block px-2 py-1 rounded text-xs font-medium ${
+                    stipend.withdrawn
+                      ? "bg-gray-200 text-gray-700"
+                      : unlocked
+                      ? "bg-green-100 text-green-700"
+                      : "bg-yellow-100 text-yellow-700"
+                  }`}
+                >
+                  {stipend.withdrawn
+                    ? "Withdrawn"
+                    : unlocked
+                    ? "Available"
+                    : "Locked"}
+                </span>
+              </td>
+              <td className="py-2 px-4">
+                <button
+                  disabled={!unlocked || loading}
+                  onClick={() => handleWithdraw(index)}
+                  className={`px-3 py-1 rounded text-xs font-medium transition ${
+                    unlocked
+                      ? "bg-blue-600 hover:bg-blue-700 text-white"
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  }`}
+                >
+                  Withdraw
+                </button>
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  )}
+</div>
+
+
+        {/* <div className="bg-white shadow rounded-lg p-6 overflow-auto">
           <h3 className="text-lg font-semibold mb-4 text-black">Your Stipends</h3>
           {stipends.length === 0 ? (
             <p className="text-gray-500">No stipends assigned yet.</p>
@@ -169,7 +295,7 @@ export default function StudentDashboard() {
               </tbody>
             </table>
           )}
-        </div>
+        </div> */}
       </main>
     </div>
   );

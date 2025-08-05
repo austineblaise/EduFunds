@@ -1,39 +1,48 @@
-
-
 // pages/index.tsx
+"use client";
+
 import Navbar from "@/components/Navbar";
 import Link from "next/link";
 
 export default function Home() {
   return (
-    <div>
+    <div className="min-h-screen bg-[#0f0f0f] text-white">
       <Navbar />
-      <main className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4">
-        <h1 className="text-4xl font-bold text-center text-green-700">
-          Welcome to BlessingNGN
-        </h1>
-        <p className="text-center mt-4 text-gray-600 max-w-lg">
-          A Celo-based app for managing student stipends with spending controls and savings logic.
-        </p>
 
-        <div className="mt-8 space-x-4">
+      <main className="flex flex-col items-center justify-center px-4 py-20 text-center">
+        <h1 className="text-5xl sm:text-6xl font-extrabold bg-gradient-to-r from-green-400 to-blue-500 text-transparent bg-clip-text">
+          Welcome to EduFunds
+        </h1>
+
+        <p className="mt-6 text-lg sm:text-xl text-gray-300 max-w-2xl">
+  A Celo-powered platform for managing student stipends — with smart spending controls, automated savings, real-time withdrawal tracking, and transparent fund allocation between parents and students.
+</p>
+
+
+        <div className="mt-10 flex flex-col sm:flex-row items-center gap-4">
           <Link
             href="/parent"
-            className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700"
+            className="bg-green-600 hover:bg-green-700 px-6 py-3 rounded-lg text-white font-semibold shadow-lg transition duration-200 w-48 text-center"
           >
             I’m a Parent
           </Link>
           <Link
             href="/student"
-            className="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700"
+            className="bg-blue-600 hover:bg-blue-700 px-6 py-3 rounded-lg text-white font-semibold shadow-lg transition duration-200 w-48 text-center"
           >
             I’m a Student
           </Link>
         </div>
+
+        <footer className="mt-16 text-sm text-gray-500">
+          Built on <span className="text-green-400 font-medium">Celo Blockchain</span>
+        </footer>
       </main>
     </div>
   );
 }
+
+
 
 
 // "use client";
