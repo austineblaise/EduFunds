@@ -142,9 +142,9 @@ export default function ParentDashboard() {
           ) : (
             <div className="flex flex-col gap-1">
               <div className="flex items-center justify-between">
-                <span>
+                <span className="text-white">
                   Wallet:{" "}
-                  <span className="font-mono text-gray-500">
+                  <span className="font-mono text-green-500">
                     {address?.slice(0, 6)}...{address?.slice(-4)}
                   </span>
                 </span>
@@ -155,9 +155,9 @@ export default function ParentDashboard() {
                   Disconnect
                 </button>
               </div>
-              <div>
+              <div className="text-white">
                 Balance:{" "}
-                <span className="font-semibold text-green-700">
+                <span className="font-semibold text-green-500">
                   {balance} EDU
                 </span>
               </div>
