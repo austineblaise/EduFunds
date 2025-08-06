@@ -8,25 +8,17 @@ import { ethers } from "ethers";
 import EduTokenAbi from "@/lib/abis/EduToken.json";
 import StipendManagerAbi from "@/lib/abis/StipendManager.json";
 import { toast } from "react-toastify";
-import { FaBox, FaEthereum } from "react-icons/fa";
-import { SiWalletconnect } from "react-icons/si";
-
-const connectorIcons: Record<string, JSX.Element> = {
-  MetaMask: <FaBox className="text-orange-500 text-xl" />,
-  WalletConnect: <SiWalletconnect className="text-blue-500 text-xl" />,
-  Injected: <FaEthereum className="text-purple-500 text-xl" />,
-};
-
-
+import { switchToAlfajores } from "@/lib/connectWallet";
+import { getWalletClient } from "wagmi/actions";
+import { config } from "@/lib/wagmi";
 
 const EDU_TOKEN_ADDRESS = "0x7E687dAD5c906EEF0915196A14Ebf1Ef0e1AdD3D";
 const STIPEND_MANAGER_ADDRESS = "0xc31c5d51D3a1b234401A7F8f5804f85bb7877fcf";
 
 export default function ParentDashboard() {
   const { address, isConnected } = useAccount();
-  // const { connect } = useConnect();
+  const { connect } = useConnect();
   const { disconnect } = useDisconnect();
-  // const { connectors } = useConnect();
 
   const [student, setStudent] = useState("");
   const [amount, setAmount] = useState("");
@@ -35,17 +27,25 @@ export default function ParentDashboard() {
   const [balance, setBalance] = useState("0");
   const [loadingAssign, setLoadingAssign] = useState(false);
   const [loadingMint, setLoadingMint] = useState(false);
-  const { connect, connectors } = useConnect();
 
   // const getSigner = async () => {
   //   const provider = new ethers.BrowserProvider((window as any).ethereum);
   //   return await provider.getSigner();
   // };
 
+  // const getSigner = async () => {
+  //   const provider = new ethers.providers.Web3Provider(window.ethereum);
+  //   return provider.getSigner();
+  // };
+
   const getSigner = async () => {
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const walletClient = await getWalletClient(config);
+    if (!walletClient) throw new Error("No wallet client found");
+  
+    const provider = new ethers.providers.Web3Provider(walletClient.transport);
     return provider.getSigner();
   };
+  
 
   const fetchBalance = async () => {
     if (!address) return;
@@ -156,22 +156,15 @@ export default function ParentDashboard() {
                 Connect Wallet
               </button> */}
 
-<div className="flex flex-col gap-2 w-full">
-  {connectors.map((connector) => (
-    <button
-      key={connector.uid}
-      onClick={() => connect({ connector })}
-      disabled={!connector.ready}
-      className="flex items-center justify-between w-full border px-4 py-3 rounded hover:bg-gray-100 transition text-sm font-medium bg-white text-black"
-    >
-      <span className="flex items-center gap-2">
-        {connectorIcons[connector.name] || <FaEthereum />} {connector.name}
-      </span>
-    </button>
-  ))}
-</div>
-
-
+              <button
+                onClick={async () => {
+                  await connect({ connector: injected() });
+                  await switchToAlfajores();
+                }}
+                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
+              >
+                Connect Wallet
+              </button>
             </div>
           ) : (
             <div className="flex flex-col gap-1">
