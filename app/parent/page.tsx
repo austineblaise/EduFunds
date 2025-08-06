@@ -9,13 +9,18 @@ import EduTokenAbi from "@/lib/abis/EduToken.json";
 import StipendManagerAbi from "@/lib/abis/StipendManager.json";
 import { toast } from "react-toastify";
 
+
+
+
+
 const EDU_TOKEN_ADDRESS = "0x7E687dAD5c906EEF0915196A14Ebf1Ef0e1AdD3D";
 const STIPEND_MANAGER_ADDRESS = "0xc31c5d51D3a1b234401A7F8f5804f85bb7877fcf";
 
 export default function ParentDashboard() {
   const { address, isConnected } = useAccount();
-  const { connect } = useConnect();
+  // const { connect } = useConnect();
   const { disconnect } = useDisconnect();
+  // const { connectors } = useConnect();
 
   const [student, setStudent] = useState("");
   const [amount, setAmount] = useState("");
@@ -24,6 +29,7 @@ export default function ParentDashboard() {
   const [balance, setBalance] = useState("0");
   const [loadingAssign, setLoadingAssign] = useState(false);
   const [loadingMint, setLoadingMint] = useState(false);
+  const { connect, connectors } = useConnect();
 
   // const getSigner = async () => {
   //   const provider = new ethers.BrowserProvider((window as any).ethereum);
@@ -34,8 +40,6 @@ export default function ParentDashboard() {
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     return provider.getSigner();
   };
-  
-  
 
   const fetchBalance = async () => {
     if (!address) return;
@@ -139,12 +143,23 @@ export default function ParentDashboard() {
         <div className="mb-6 text-sm text-gray-700">
           {!isConnected ? (
             <div className="flex justify-center">
-              <button
+              {/* <button
                 onClick={() => connect({ connector: injected() })}
                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-center"
               >
                 Connect Wallet
-              </button>
+              </button> */}
+
+{connectors.map((connector) => (
+  <button
+    key={connector.uid}
+    onClick={() => connect({ connector })}
+    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded mb-2 w-full"
+  >
+    Connect with {connector.name}
+  </button>
+))}
+
             </div>
           ) : (
             <div className="flex flex-col gap-1">
@@ -189,78 +204,74 @@ export default function ParentDashboard() {
           </button>
         </section>
 
-
         <section className="bg-white shadow-md rounded-xl p-6 text-black">
-  <h2 className="text-xl font-semibold mb-4">Assign Stipend</h2>
+          <h2 className="text-xl font-semibold mb-4">Assign Stipend</h2>
 
-  <div className="grid gap-4">
-    <div className="flex flex-col">
-      <label htmlFor="student" className="mb-1 text-sm font-medium">
-        Student Wallet Address
-      </label>
-      <input
-        id="student"
-        type="text"
-        placeholder="0x123..."
-        value={student}
-        onChange={(e) => setStudent(e.target.value)}
-        className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring focus:border-blue-400"
-      />
-    </div>
+          <div className="grid gap-4">
+            <div className="flex flex-col">
+              <label htmlFor="student" className="mb-1 text-sm font-medium">
+                Student Wallet Address
+              </label>
+              <input
+                id="student"
+                type="text"
+                placeholder="0x123..."
+                value={student}
+                onChange={(e) => setStudent(e.target.value)}
+                className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring focus:border-blue-400"
+              />
+            </div>
 
-    <div className="flex flex-col">
-      <label htmlFor="amount" className="mb-1 text-sm font-medium">
-        Amount (EDU)
-      </label>
-      <input
-        id="amount"
-        type="number"
-        placeholder="e.g. 50"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
-        className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring focus:border-blue-400"
-      />
-    </div>
+            <div className="flex flex-col">
+              <label htmlFor="amount" className="mb-1 text-sm font-medium">
+                Amount (EDU)
+              </label>
+              <input
+                id="amount"
+                type="number"
+                placeholder="e.g. 50"
+                value={amount}
+                onChange={(e) => setAmount(e.target.value)}
+                className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring focus:border-blue-400"
+              />
+            </div>
 
-    <div className="flex flex-col">
-      <label htmlFor="category" className="mb-1 text-sm font-medium">
-        Category (e.g. books, transport)
-      </label>
-      <input
-        id="category"
-        type="text"
-        placeholder="e.g. food, transport"
-        value={category}
-        onChange={(e) => setCategory(e.target.value)}
-        className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring focus:border-blue-400"
-      />
-    </div>
+            <div className="flex flex-col">
+              <label htmlFor="category" className="mb-1 text-sm font-medium">
+                Category (e.g. books, transport)
+              </label>
+              <input
+                id="category"
+                type="text"
+                placeholder="e.g. food, transport"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring focus:border-blue-400"
+              />
+            </div>
 
-    <div className="flex flex-col">
-      <label htmlFor="unlockDate" className="mb-1 text-sm font-medium">
-        Unlock Date & Time
-      </label>
-      <input
-        id="unlockDate"
-        type="datetime-local"
-        value={unlockDate}
-        onChange={(e) => setUnlockDate(e.target.value)}
-        className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring focus:border-blue-400"
-      />
-    </div>
+            <div className="flex flex-col">
+              <label htmlFor="unlockDate" className="mb-1 text-sm font-medium">
+                Unlock Date & Time
+              </label>
+              <input
+                id="unlockDate"
+                type="datetime-local"
+                value={unlockDate}
+                onChange={(e) => setUnlockDate(e.target.value)}
+                className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring focus:border-blue-400"
+              />
+            </div>
 
-    <button
-      onClick={handleAssign}
-      disabled={loadingAssign}
-      className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded transition disabled:opacity-60"
-    >
-      {loadingAssign ? "Assigning..." : "Assign Stipend"}
-    </button>
-  </div>
-</section>
-
-
-     
+            <button
+              onClick={handleAssign}
+              disabled={loadingAssign}
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded transition disabled:opacity-60"
+            >
+              {loadingAssign ? "Assigning..." : "Assign Stipend"}
+            </button>
+          </div>
+        </section>
       </main>
     </div>
   );
