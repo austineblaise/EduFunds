@@ -4584,6 +4584,7 @@ __metadata:
     eruda: "npm:^3.2.3"
     eslint: "npm:^8"
     eslint-config-next: "npm:14.2.6"
+    ethers: "npm:5"
     framer-motion: "npm:^12.23.2"
     jiti: "npm:1.21.7"
     jose: "npm:^5.9.6"
@@ -7118,7 +7119,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ethers@npm:^5.7.1, ethers@npm:^5.7.2":
+"ethers@npm:5, ethers@npm:^5.7.1, ethers@npm:^5.7.2":
   version: 5.8.0
   resolution: "ethers@npm:5.8.0"
   dependencies:

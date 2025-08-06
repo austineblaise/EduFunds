@@ -25,10 +25,17 @@ export default function ParentDashboard() {
   const [loadingAssign, setLoadingAssign] = useState(false);
   const [loadingMint, setLoadingMint] = useState(false);
 
+  // const getSigner = async () => {
+  //   const provider = new ethers.BrowserProvider((window as any).ethereum);
+  //   return await provider.getSigner();
+  // };
+
   const getSigner = async () => {
-    const provider = new ethers.BrowserProvider((window as any).ethereum);
-    return await provider.getSigner();
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    return provider.getSigner();
   };
+  
+  
 
   const fetchBalance = async () => {
     if (!address) return;
@@ -40,7 +47,7 @@ export default function ParentDashboard() {
         signer
       );
       const bal = await edu.balanceOf(address);
-      setBalance(ethers.formatEther(bal));
+      setBalance(ethers.utils.formatEther(bal));
     } catch (err) {
       console.error("Failed to fetch balance:", err);
     }
@@ -60,7 +67,7 @@ export default function ParentDashboard() {
         EduTokenAbi.abi,
         signer
       );
-      const tx = await edu.mint(address, ethers.parseEther("1000"));
+      const tx = await edu.mint(address, ethers.utils.parseEther("1000"));
       await tx.wait();
       await fetchBalance();
       toast.success("✅ Minted 1000 EDU!");
@@ -74,7 +81,7 @@ export default function ParentDashboard() {
 
   const handleAssign = async () => {
     if (!isConnected) return toast.info("Please connect wallet");
-    if (!ethers.isAddress(student))
+    if (!ethers.utils.isAddress(student))
       return toast.error("Invalid student address");
     if (!amount || !category || !unlockDate)
       return toast.error("Fill all fields");
@@ -93,7 +100,7 @@ export default function ParentDashboard() {
         signer
       );
 
-      const amountWei = ethers.parseEther(amount);
+      const amountWei = ethers.utils.parseEther(amount);
       // const unlock = Math.floor(new Date(unlockDate).getTime() / 1000);
       const unlock = Math.floor(new Date(unlockDate).getTime() / 1000);
 
@@ -253,47 +260,7 @@ export default function ParentDashboard() {
 </section>
 
 
-        {/* <section className="bg-white shadow-md rounded-xl p-6 text-black">
-          <h2 className="text-xl font-semibold mb-4">Assign Stipend</h2>
-
-          <div className="grid gap-4">
-            <input
-              type="text"
-              placeholder="Student Wallet Address"
-              value={student}
-              onChange={(e) => setStudent(e.target.value)}
-              className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring focus:border-blue-400"
-            />
-            <input
-              type="number"
-              placeholder="Amount (EDU)"
-              value={amount}
-              onChange={(e) => setAmount(e.target.value)}
-              className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring focus:border-blue-400"
-            />
-            <input
-              type="text"
-              placeholder="Category (e.g. books, transport)"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring focus:border-blue-400"
-            />
-            <input
-              type="datetime-local"
-              value={unlockDate}
-              onChange={(e) => setUnlockDate(e.target.value)}
-              className="border border-gray-300 rounded px-4 py-2 focus:outline-none focus:ring focus:border-blue-400"
-            />
-
-            <button
-              onClick={handleAssign}
-              disabled={loadingAssign}
-              className="w-full bg-blue-600 hover:bg-blue-700 text-white py-2 rounded transition disabled:opacity-60"
-            >
-              {loadingAssign ? "Assigning..." : "Assign Stipend"}
-            </button>
-          </div>
-        </section> */}
+     
       </main>
     </div>
   );

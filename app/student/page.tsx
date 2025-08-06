@@ -28,12 +28,10 @@ export default function StudentDashboard() {
 
   const [stipends, setStipends] = useState<Stipend[]>([]);
   const [loading, setLoading] = useState(false);
-
   const getSigner = async () => {
-    const provider = new ethers.BrowserProvider((window as any).ethereum);
-    return await provider.getSigner();
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    return provider.getSigner();
   };
-
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -58,7 +56,7 @@ export default function StudentDashboard() {
       const data = await stipend.getMyStipends();
       setStipends(
         data.map((s: any) => ({
-          amount: Number(ethers.formatEther(s.amount)),
+          amount: Number(ethers.utils.formatEther(s.amount)),
           unlockDate: Number(s.unlockDate),
           withdrawn: s.withdrawn,
           category: s.category ?? "Unspecified",
