@@ -8,8 +8,14 @@ import { ethers } from "ethers";
 import EduTokenAbi from "@/lib/abis/EduToken.json";
 import StipendManagerAbi from "@/lib/abis/StipendManager.json";
 import { toast } from "react-toastify";
+import { FaBox, FaEthereum } from "react-icons/fa";
+import { SiWalletconnect } from "react-icons/si";
 
-
+const connectorIcons: Record<string, JSX.Element> = {
+  MetaMask: <FaBox className="text-orange-500 text-xl" />,
+  WalletConnect: <SiWalletconnect className="text-blue-500 text-xl" />,
+  Injected: <FaEthereum className="text-purple-500 text-xl" />,
+};
 
 
 
@@ -150,15 +156,21 @@ export default function ParentDashboard() {
                 Connect Wallet
               </button> */}
 
-{connectors.map((connector) => (
-  <button
-    key={connector.uid}
-    onClick={() => connect({ connector })}
-    className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded mb-2 w-full"
-  >
-    Connect with {connector.name}
-  </button>
-))}
+<div className="flex flex-col gap-2 w-full">
+  {connectors.map((connector) => (
+    <button
+      key={connector.uid}
+      onClick={() => connect({ connector })}
+      disabled={!connector.ready}
+      className="flex items-center justify-between w-full border px-4 py-3 rounded hover:bg-gray-100 transition text-sm font-medium bg-white text-black"
+    >
+      <span className="flex items-center gap-2">
+        {connectorIcons[connector.name] || <FaEthereum />} {connector.name}
+      </span>
+    </button>
+  ))}
+</div>
+
 
             </div>
           ) : (
