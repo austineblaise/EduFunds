@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import { switchToAlfajores } from "@/lib/connectWallet";
 import { getWalletClient } from "wagmi/actions";
 import { config } from "@/lib/wagmi";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
 
 const EDU_TOKEN_ADDRESS = "0x7E687dAD5c906EEF0915196A14Ebf1Ef0e1AdD3D";
 const STIPEND_MANAGER_ADDRESS = "0xc31c5d51D3a1b234401A7F8f5804f85bb7877fcf";
@@ -38,14 +39,21 @@ export default function ParentDashboard() {
   //   return provider.getSigner();
   // };
 
+  // const getSigner = async () => {
+  //   const walletClient = await getWalletClient(config);
+  //   if (!walletClient) throw new Error("No wallet client found");
+
+  //   const provider = new ethers.providers.Web3Provider(walletClient.transport);
+  //   return provider.getSigner();
+  // };
+
   const getSigner = async () => {
     const walletClient = await getWalletClient(config);
     if (!walletClient) throw new Error("No wallet client found");
-  
-    const provider = new ethers.providers.Web3Provider(walletClient.transport);
-    return provider.getSigner();
+
+    const provider = new ethers.providers.Web3Provider(window.ethereum); // ✅ this is correct
+    return provider.getSigner(walletClient.account.address); // pass in connected account
   };
-  
 
   const fetchBalance = async () => {
     if (!address) return;
@@ -156,7 +164,7 @@ export default function ParentDashboard() {
                 Connect Wallet
               </button> */}
 
-              <button
+              {/* <button
                 onClick={async () => {
                   await connect({ connector: injected() });
                   await switchToAlfajores();
@@ -164,7 +172,11 @@ export default function ParentDashboard() {
                 className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded"
               >
                 Connect Wallet
-              </button>
+              </button> */}
+
+              <div className="flex justify-center">
+                <ConnectButton />
+              </div>
             </div>
           ) : (
             <div className="flex flex-col gap-1">
